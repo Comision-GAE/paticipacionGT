@@ -31,3 +31,6 @@
 
 en:
   hello: "Hello world"
+  decidim:
+    menu:
+      about: About this platform
