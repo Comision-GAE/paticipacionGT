@@ -1,15 +1,18 @@
 version: '3'
 services:
   app:
-    image: decidim/decidim:0.30.0
+    env_file: ".env"
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - .:/app
-      - bundle:/usr/local/bundle
-      - node_modules:/app/node_modules
+      #- node_modules:/app/node_modules
+      - ${STORAGE_PATH:-storage}:/app/storage
+      - ${LOGS_PATH:-logs}:/app/logs
+      - ${PUBLIC_PATH:-public}:/app/public
     environment:
       - PORT=3000
-      - DATABASE_HOST=pg
-      - DATABASE_USERNAME=postgres
       - RAILS_ENV=development
     ports:
       - 3000:3000
@@ -20,6 +23,10 @@ services:
     image: postgres
     volumes:
       - pg-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: decidim_guatemala_development
 volumes:
   node_modules: {}
   bundle: {}

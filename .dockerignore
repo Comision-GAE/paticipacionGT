@@ -1,0 +1,7 @@
+storage/
+decidim-packs/
+packs-test/
+node_modules/
+.rspec
+.rspec-failures
+tailwind.config.js
