@@ -18,6 +18,8 @@ services:
       - 3000:3000
     command: bundle exec puma
     restart: on-failure
+    tty: true
+    stdin_open: true
   pg:
     env_file: ".env"
     image: postgres
@@ -28,9 +30,9 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: decidim_guatemala_development
     restart: on-failure
+    stdin_open: true
+    tty: true
 volumes:
   node_modules: {}
   bundle: {}
   pg_data: {}
-tty: true
-stdin_open: true
