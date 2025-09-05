@@ -30,3 +30,5 @@ volumes:
   node_modules: {}
   bundle: {}
   pg_data: {}
+tty: true
+stdin_open: true
