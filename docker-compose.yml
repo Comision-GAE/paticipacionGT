@@ -17,6 +17,7 @@ services:
     ports:
       - 3000:3000
     command: bundle exec puma
+    restart: on-failure
   pg:
     env_file: ".env"
     image: postgres
@@ -26,6 +27,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: decidim_guatemala_development
+    restart: on-failure
 volumes:
   node_modules: {}
   bundle: {}
