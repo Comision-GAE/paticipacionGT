@@ -31,6 +31,5 @@ services:
     stdin_open: true
     tty: true
 volumes:
-  node_modules: {}
   bundle: {}
   pg_data: {}
