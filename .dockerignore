@@ -1,5 +1,4 @@
 storage/
-decidim-packs/
 packs-test/
 node_modules/
 .rspec
