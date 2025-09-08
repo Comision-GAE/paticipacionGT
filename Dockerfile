@@ -1,7 +1,10 @@
-FROM ruby:3.3.4 
+FROM ruby:3.3.4
 
-ENV RAILS_ENV=development
-ENV PORT=3000
+ARG RAILS_ENV
+ARG PORT
+
+ENV RAILS_ENV=${RAILS_ENV:-production}
+ENV PORT=${RAILS_PORT:-3000}
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y ca-certificates curl gnupg && \
     mkdir -p /etc/apt/keyrings && \
@@ -61,17 +64,10 @@ COPY ./postcss.config.js /app/postcss.config.js
 #
 # Notes:
 #   1. Executing "assets:precompile" runs "webpacker:compile", too
-#   2. For an app using encrypted credentials, Rails raises a `MissingKeyError`
-#      if the master key is missing. Because on CI there is no master key,
-#      we hide the credentials while compiling assets (by renaming them before and after)
-#
-# RUN mv config/credentials.yml.enc config/credentials.yml.enc.bak 2>/dev/null || true
-# RUN mv config/credentials config/credentials.bak 2>/dev/null || true
 
-RUN bin/rails assets:precompile
-
-# RUN mv config/credentials.yml.enc.bak config/credentials.yml.enc 2>/dev/null || true
-# RUN mv config/credentials.bak config/credentials 2>/dev/null || true
+RUN DB_ADAPTER=nulldb \
+SECRET_KEY_BASE=dummy \
+bin/rails assets:precompile
 
 #RUN rm -rf node_modules tmp/cache vendor/bundle test spec app/packs .git*
 RUN rm -rf tmp/cache vendor/bundle test spec .git*
