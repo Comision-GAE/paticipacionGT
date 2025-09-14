@@ -1,7 +1,7 @@
-version: '3'
+name: decidim-guatemala
 services:
   app:
-    env_file: ".env"
+    env_file: .env
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,24 +11,19 @@ services:
       - ${LOGS_PATH:-logs}:/app/logs
       - /app/node_modules
     environment:
-      - PORT=3000
-      - RAILS_ENV=development
       - SHAKAPACKER_DEV_SERVER_WATCH_POLLING=true
+      - RAILS_SERVE_STATIC_FILES=true
     ports:
-      - 3000:3000
-    command: bundle exec puma
-    restart: on-failure
+      - ${RAILS_PORT}:3000
     tty: true
     stdin_open: true
   pg:
-    env_file: ".env"
+    env_file: .env
     image: postgres
+    ports:
+      - 5433:5432 # Map host port 5433 to container port 5432
     volumes:
       - ${POSTGRES_PATH:-pg_data}:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: decidim_guatemala_development
     restart: on-failure
     stdin_open: true
     tty: true
