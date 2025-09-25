@@ -8,7 +8,7 @@ services:
     volumes:
       - .:/app
       - ${STORAGE_PATH:-storage}:/app/storage
-      - ${LOGS_PATH:-logs}:/app/logs
+      - ${LOGS_PATH}:/app/log
       - /app/node_modules
     environment:
       - SHAKAPACKER_DEV_SERVER_WATCH_POLLING=true
