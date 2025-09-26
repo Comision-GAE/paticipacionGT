@@ -10,6 +10,7 @@ services:
       - ${STORAGE_PATH:-storage}:/app/storage
       - ${LOGS_PATH}:/app/log
       - /app/node_modules
+      - tmp_cache:/app/tmp
     environment:
       - SHAKAPACKER_DEV_SERVER_WATCH_POLLING=true
       - RAILS_SERVE_STATIC_FILES=true
@@ -17,6 +18,18 @@ services:
       - ${RAILS_PORT}:3000
     tty: true
     stdin_open: true
+  delayed_job:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: "bundle exec rake jobs:work"
+    env_file:
+      - .env
+    volumes:
+      - ${LOGS_PATH}:/app/log
+      - tmp_cache:/app/tmp
+    depends_on:
+      - app
   pg:
     env_file: .env
     image: postgres
@@ -30,3 +43,4 @@ services:
 volumes:
   bundle: {}
   pg_data: {}
+  tmp_cache: {}
