@@ -92,10 +92,13 @@ WORKDIR /app
 COPY ./entrypoint.sh /app/entrypoint.sh
 COPY --from=builder --chown=app:app  /usr/local/bundle/ /usr/local/bundle
 COPY --from=builder --chown=app:app /app /app
+RUN mkdir /app/log
+RUN chown -R app:app /app/log
 RUN chown -R app:app /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 USER app
+
 EXPOSE ${RAILS_PORT}
 
 ENTRYPOINT ["/app/entrypoint.sh"]
