@@ -83,7 +83,7 @@ ENV RAILS_ENV=${RAILS_ENV} \
 
 RUN set -eux; \
   apt-get update; \
-  apt-get install -y --no-install-recommends ca-certificates curl tzdata libpq5; \
+  apt-get install -y --no-install-recommends ca-certificates curl tzdata libpq5 imagemagick; \
   rm -rf /var/lib/apt/lists/*
 
 RUN groupadd -g 1000 app && useradd -m -u 1000 -g 1000 app 

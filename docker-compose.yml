@@ -21,7 +21,7 @@ services:
       pg:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:3000/up || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS tcp://0.0.0.0:${RAILS_PORT}/up || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -35,7 +35,7 @@ services:
     volumes:
       - tmp_cache:/app/tmp
       - ${STORAGE_PATH:-storage}:/app/storage
-      - ${LOGS_PATH:-logs}:/app/logs
+      - ${LOGS_PATH:-logs}:/app/log
     depends_on:
       app:
         condition: service_healthy
