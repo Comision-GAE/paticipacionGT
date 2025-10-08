@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # This migration comes from decidim (originally 20241022002600)
-# This file has been modified by `decidim upgrade:migrations` task on 2025-09-14 23:39:12 UTC
+# This file has been modified by `decidim upgrade:migrations` task on 2025-09-29 15:37:03 UTC
 class CreatePrivateExports < ActiveRecord::Migration[7.0]
   def change
     create_table :decidim_private_exports, id: :uuid do |t|

@@ -4,3 +4,4 @@ node_modules/
 .rspec
 .rspec-failures
 tailwind.config.js
+config/credentials.yml.enc

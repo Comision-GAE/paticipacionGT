@@ -1,90 +1,48 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-# Source the .env file to load environment variables
-if [ -f .env ]; then
-  echo "Loading environment variables from .env file..."
-  export $(grep -v '^#' .env | xargs)
-fi
+: "${RAILS_ENV}"
+: "${RAILS_PORT:=3000}"
+: "${RUN_MIGRATIONS:=false}"
+: "${RUN_UPGRADE_TASKS:=false}"
+: "${PRECOMPILE_ASSETS_AT_RUNTIME:=false}"
+: "${DB_WAIT:=true}"
+: "${DB_WAIT_TIMEOUT:=90}"
+: "${DATABASE_HOST:=pg}"
+: "${DATABASE_PORT:=5432}"
+: "${DATABASE_URL}"
+: "${SECRET_KEY_BASE}"
 
-# Execute a command and log it
-log_and_run() {
-  echo "Running: $*"
-  "$@"
-}
-# Wait for the database to be ready
-wait_for_database() {
-  echo "Waiting for database to be ready..."
-  until pg_isready -h "$DATABASE_HOST" -p "$DATABASE_PORT" -U "$DATABASE_USERNAME"; do
-    echo "Database is not ready. Retrying in 2 seconds..."
+log()  { echo "[entrypoint] $*"; }
+run()  { log ">> $*"; "$@"; }
+log "Running environment RAILS_ENV: $RAILS_ENV"
+log "Using DATABASE_URL: $DATABASE_URL"
+log "Using SECRET_KEY_BASE: $SECRET_KEY_BASE"
+[ -f tmp/pids/server.pid ] && rm -f tmp/pids/server.pid
+
+wait_for_db() {
+  [ "$DB_WAIT" = "true" ] || return 0
+  start_ts=$(date +%s)
+  while :; do
+    ruby -e "require 'socket'; TCPSocket.new('${DATABASE_HOST}',${DATABASE_PORT}).close"       && { log "DB ready"; break; } || true
+    elapsed=$(( $(date +%s) - start_ts ))
+    [ "$elapsed" -ge "$DB_WAIT_TIMEOUT" ] && { log "DB timeout"; exit 1; }
     sleep 2
   done
-  echo "Database is ready!"
 }
-
-# Call the wait_for_database function before proceeding
-wait_for_database
+wait_for_db
 
 if [ "$RAILS_ENV" = "production" ]; then
-  echo "=== Starting in PRODUCTION mode ==="
-
-  # Clean pid if exists
-  if [ -f tmp/pids/server.pid ]; then
-    echo "Remove old PID file"
-    rm tmp/pids/server.pid
+  [ "$RUN_UPGRADE_TASKS" = "true" ] && run bundle exec rails decidim:upgrade
+  [ "$RUN_MIGRATIONS" = "true" ] && run bundle exec rails db:migrate
+  if [ "$PRECOMPILE_ASSETS_AT_RUNTIME" = "true" ]; then
+    : "${SECRET_KEY_BASE:=dummy}"
+    run bundle exec rails assets:clobber
+    run bundle exec rails assets:precompile
   fi
-  npm cache clean --force
-  # Install/update JavaScript dependencies
-  if [ -f "package.json" ]; then
-    echo "Install/update JavaScript dependencies."
-    npm install
-  fi
-
-  # Run decidim upgrade tasks
-  log_and_run bin/rails decidim:upgrade RAILS_ENV=production
-
-  # database migrate
-  log_and_run bin/rails db:migrate RAILS_ENV=production
-
-  # Clean and recompile assets
-  log_and_run bin/rails assets:clean RAILS_ENV=production
-  log_and_run bin/rails assets:precompile RAILS_ENV=production
-
-  # Run Puma
-  echo "=== Starting Puma ==="
-  exec bundle exec puma -C config/puma.rb -e production
+  exec bundle exec puma -C config/puma.rb -e production -b "tcp://0.0.0.0:${RAILS_PORT}"
 else
-  echo "===Starting in DEVELOPMENT mode ==="
-
-  # clean pid file if exists
-  if [ -f tmp/pids/server.pid ]; then
-    echo "Remove old PID file..."
-    rm tmp/pids/server.pid
-  fi
-
-  # Upgrade tasks
-  log_and_run bin/rails decidim:upgrade
-
-  # Check if DATABASE_RECREATE is set
-  if [ "$DATABASE_RECREATE" = "true" ]; then
-    echo "DATABASE_RECREATE is set. Running rails db:create..."
-    log_and_run bin/rails db:create
-  else
-    echo "DATABASE_RECREATE is not set. Skipping rails db:create."
-  fi
-
-  # Migrate files
-  log_and_run bin/rails db:migrate
-  npm cache clean --force
-  if [ -f "package.json" ]; then
-    echo "Install/update JavaScript dependencies."
-    npm install
-  fi
-  # Precompile assets
-  log_and_run bin/rails assets:precompile
-
-  # Start Rails server
-  echo "=== Booting Rails server ==="
-  exec bin/rails s -b 0.0.0.0
+  run bundle exec rails db:prepare
+  run bundle exec rails decidim:procfile:install
+  exec bin/dev
 fi
-exec "$@"

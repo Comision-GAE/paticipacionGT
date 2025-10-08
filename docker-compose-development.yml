@@ -1,0 +1,65 @@
+name: decidim-guatemala-development
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    env_file: .env
+    environment:
+      - RAILS_ENV=development
+      - DB_WAIT=true
+      - DATABASE_URL=postgresql://${DATABASE_USERNAME:-postgres}:${DATABASE_PASSWORD:-postgres}@${DATABASE_HOST:-pg}:5432/${DATABASE_NAME:-postgres}
+    volumes:
+      - tmp_cache:/app/tmp
+      - ${STORAGE_PATH:-storage}:/app/storage
+      - ${LOGS_PATH:-log}:/app/log
+    ports:
+      - ${RAILS_PORT}:3000
+      - 3035:3035 # For webpacker dev server
+    tty: true
+    stdin_open: true
+    depends_on:
+      pg:
+        condition: service_healthy
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -fsS http://localhost:3000/up || exit 1"]
+    #   interval: 30s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 40s
+  # delayed_job:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: bundle exec rake jobs:work
+  #   env_file: .env
+  #   volumes:
+  #     - tmp_cache:/app/tmp
+  #     - ${STORAGE_PATH:-storage}:/app/storage
+  #     - ${LOGS_PATH:-logs}:/app/logs
+  #   depends_on:
+  #     app:
+  #       condition: service_healthy
+  #   restart: unless-stopped
+  pg:
+    env_file: .env
+    image: postgres:16-alpine
+    ports:
+      - 5433:5432 # Map host port 5433 to container port 5432
+    environment:
+      - POSTGRES_USER=${DATABASE_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-postgres}
+      - POSTGRES_DB=${DATABASE_NAME:-postgres}
+    volumes:
+      - ${POSTGRES_PATH:-pg_data}:/var/lib/postgresql/data
+    restart: on-failure
+    stdin_open: true
+    tty: true
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres} -h localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 2s
+volumes:
+  tmp_cache: {}
