@@ -13,7 +13,7 @@ services:
       - tmp_cache:/app/tmp
       - ${STORAGE_PATH:-storage}:/app/storage
     ports:
-      - ${RAILS_PORT}:3000
+      - 3000:${RAILS_PORT}
     tty: true
     stdin_open: true
     depends_on:
@@ -43,7 +43,7 @@ services:
     env_file: .env
     image: postgres:16-alpine
     ports:
-      - 5433:5432 # Map host port 5433 to container port 5432
+      - 5432:${DATABASE_PORT} # Map host port 5433 to container port 5432
     environment:
       - POSTGRES_USER=${DATABASE_USERNAME:-postgres}
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-postgres}
