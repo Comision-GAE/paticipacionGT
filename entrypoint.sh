@@ -9,7 +9,6 @@ set -euo pipefail
 : "${DB_WAIT:=true}"
 : "${DB_WAIT_TIMEOUT:=90}"
 : "${DATABASE_HOST:=pg}"
-: "${DATABASE_PORT:=5432}"
 : "${DATABASE_URL}"
 : "${SECRET_KEY_BASE}"
 
@@ -24,7 +23,7 @@ wait_for_db() {
   [ "$DB_WAIT" = "true" ] || return 0
   start_ts=$(date +%s)
   while :; do
-    ruby -e "require 'socket'; TCPSocket.new('${DATABASE_HOST}',${DATABASE_PORT}).close"       && { log "DB ready"; break; } || true
+    ruby -e "require 'socket'; TCPSocket.new('${DATABASE_HOST}',5432).close"       && { log "DB ready"; break; } || true
     elapsed=$(( $(date +%s) - start_ts ))
     [ "$elapsed" -ge "$DB_WAIT_TIMEOUT" ] && { log "DB timeout"; exit 1; }
     sleep 2
