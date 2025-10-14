@@ -9,11 +9,10 @@ services:
       - RAILS_ENV=production
       - DB_WAIT=true
       - DATABASE_URL=postgresql://${DATABASE_USERNAME:-postgres}:${DATABASE_PASSWORD:-postgres}@${DATABASE_HOST:-pg}:5432/${DATABASE_NAME:-postgres}
+      - RAILS_PORT=3000
     volumes:
       - tmp_cache:/app/tmp
       - ${STORAGE_PATH:-storage}:/app/storage
-    environment:
-      - RAILS_PORT=3000
     ports:
       - ${APP_PORT}:${RAILS_PORT}
     tty: true
