@@ -20,6 +20,7 @@ services:
     depends_on:
       pg:
         condition: service_healthy
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://0.0.0.0:${RAILS_PORT}/up || exit 1"]
       interval: 30s
