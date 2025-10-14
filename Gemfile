@@ -14,7 +14,7 @@ gem "decidim", "0.30.0"
 gem "bootsnap", "~> 1.3"
 
 gem "puma", ">= 6.3.1"
-
+gem "dotenv-rails", "~> 2.8"
 group :development, :test do
   gem "byebug", "~> 11.0", platform: :mri
 
