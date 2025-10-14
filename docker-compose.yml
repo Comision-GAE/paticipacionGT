@@ -12,7 +12,6 @@ services:
     volumes:
       - tmp_cache:/app/tmp
       - ${STORAGE_PATH:-storage}:/app/storage
-      - ${LOGS_PATH:-log}:/app/log
     ports:
       - ${RAILS_PORT}:3000
     tty: true
@@ -36,7 +35,6 @@ services:
     volumes:
       - tmp_cache:/app/tmp
       - ${STORAGE_PATH:-storage}:/app/storage
-      - ${LOGS_PATH:-logs}:/app/log
     depends_on:
       app:
         condition: service_healthy
