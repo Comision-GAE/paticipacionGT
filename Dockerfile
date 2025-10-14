@@ -75,7 +75,7 @@ RUN rm -rf node_modules tmp/cache vendor/bundle test spec app/packs .git
 FROM ruby:3.3.4-slim AS runtime
 
 ARG RAILS_ENV=production
-ARG RAILS_PORT=3000
+ARG RAILS_PORT
 ENV RAILS_ENV=${RAILS_ENV} \
     RAILS_LOG_TO_STDOUT=1 \
     RAILS_SERVE_STATIC_FILES=true \
