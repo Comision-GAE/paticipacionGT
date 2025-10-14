@@ -14,7 +14,7 @@ services:
       - tmp_cache:/app/tmp
       - ${STORAGE_PATH:-storage}:/app/storage
     ports:
-      - ${APP_PORT}:${RAILS_PORT}
+      - ${APP_PORT}:3000
     tty: true
     stdin_open: true
     depends_on:
