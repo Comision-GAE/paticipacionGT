@@ -15,7 +15,6 @@ DATABASE_PORT=5432
 log()  { echo "[entrypoint] $*"; }
 run()  { log ">> $*"; "$@"; }
 log "Running environment RAILS_ENV: $RAILS_ENV"
-log "Running environment ENV_FILE: $ENV_FILE"
 log "Using SECRET_KEY_BASE: $SECRET_KEY_BASE"
 [ -f tmp/pids/server.pid ] && rm -f tmp/pids/server.pid
 
@@ -28,7 +27,7 @@ wait_for_db() {
     [ "$elapsed" -ge "$DB_WAIT_TIMEOUT" ] && { log "DB timeout"; exit 1; }
     sleep 2
   done
-}
+}:Quick
 wait_for_db
 
 if [ "$RAILS_ENV" = "production" ]; then
