@@ -9,14 +9,13 @@ set -euo pipefail
 : "${DB_WAIT:=true}"
 : "${DB_WAIT_TIMEOUT:=90}"
 : "${DATABASE_HOST:=pg}"
-: "${DATABASE_URL}"
 : "${SECRET_KEY_BASE}"
 DATABASE_PORT=5432
 
 log()  { echo "[entrypoint] $*"; }
 run()  { log ">> $*"; "$@"; }
 log "Running environment RAILS_ENV: $RAILS_ENV"
-log "Using DATABASE_URL: $DATABASE_URL"
+log "Running environment ENV_FILE: $ENV_FILE"
 log "Using SECRET_KEY_BASE: $SECRET_KEY_BASE"
 [ -f tmp/pids/server.pid ] && rm -f tmp/pids/server.pid
 
