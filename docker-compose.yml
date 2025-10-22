@@ -8,8 +8,9 @@ services:
     environment:
       - RAILS_ENV=production
       - DB_WAIT=true
-      - DATABASE_URL=postgresql://${DATABASE_USERNAME:-postgres}:${DATABASE_PASSWORD:-postgres}@${DATABASE_HOST:-pg}:5432/${DATABASE_NAME:-postgres}
       - RAILS_PORT=3000
+      - DATABASE_PORT=5432
+      - REDIS_URL=redis://redis:6379/1
     volumes:
       - tmp_cache:/app/tmp
       - ${STORAGE_PATH:-storage}:/app/storage
@@ -20,9 +21,11 @@ services:
     depends_on:
       pg:
         condition: service_healthy
+      redis:
+        condition: service_started
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://0.0.0.0:${APP_PORT}/up || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS http://0.0.0.0:3000/up || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -44,7 +47,7 @@ services:
     env_file: .env
     image: postgres:16-alpine
     ports:
-      - ${DATABASE_PORT}:5432
+      - ${POSTGRES_PORT}:5432
     environment:
       - POSTGRES_USER=${DATABASE_USERNAME:-postgres}
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-postgres}
@@ -60,5 +63,10 @@ services:
       timeout: 5s
       retries: 6
       start_period: 2s
+  redis:
+    image: redis
+    volumes:
+      - redis_data:/data
 volumes:
   tmp_cache: {}
+  redis_data: {}
