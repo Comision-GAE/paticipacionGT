@@ -27,7 +27,7 @@ wait_for_db() {
     [ "$elapsed" -ge "$DB_WAIT_TIMEOUT" ] && { log "DB timeout"; exit 1; }
     sleep 2
   done
-}:Quick
+}
 wait_for_db
 
 if [ "$RAILS_ENV" = "production" ]; then
