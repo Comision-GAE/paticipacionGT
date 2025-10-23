@@ -66,6 +66,7 @@ Rails.application.configure do
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
+  config.cache_store = :redis_cache_store, { url: ENV["REDIS_URL"] }
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # config.active_job.queue_adapter     = :resque
@@ -94,7 +95,9 @@ Rails.application.configure do
     :password       => Rails.application.secrets.smtp_password,
     :domain         => Rails.application.secrets.smtp_domain,
     :enable_starttls_auto => Rails.application.secrets.smtp_starttls_auto,
-    :openssl_verify_mode => 'none'
+    :openssl_verify_mode => 'none',
+    :tls            => Rails.application.secrets.smtp_tls,
+    :ssl            => Rails.application.secrets.smtp_ssl
   }
 
   # Use a different logger for distributed setups.
