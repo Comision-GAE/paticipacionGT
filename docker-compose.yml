@@ -11,6 +11,7 @@ services:
       - RAILS_PORT=3000
       - DATABASE_PORT=5432
       - REDIS_URL=redis://redis:6379/1
+      - GOOGLE_ANALYTICS_TRACKING_ID=${GOOGLE_ANALYTICS_TRACKING_ID}
     volumes:
       - tmp_cache:/app/tmp
       - ${STORAGE_PATH:-storage}:/app/storage
