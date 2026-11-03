@@ -1,4 +1,4 @@
-name: decidim-guatemala
+name: decidim-guatemala-prod
 services:
   app:
     build:
